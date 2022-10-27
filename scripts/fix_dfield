@@ -1,0 +1,51 @@
+# Main:
+#   Script for imposing an electric displacement field along the z-axis.
+#
+# Parameters:
+#   dfield_group   group
+#   dfield_Dz      variable, electric displacement field (units: charge/distance^2)
+#   dfield_C       variable, units-dependent constant (read from the table below)
+#
+#       units    | dfield_qqr2e
+#       ---------------------
+#       lj       | 1.0
+#       real     | 332.06371
+#       metal    | 14.399645
+#       si       | 8.9876e9
+#       cgs      | 1.0
+#       electron | 1.0
+#       micro    | 8.987556e6
+#       nano     | 230.7078669
+#
+#       See force->qqr2e in
+#       https://github.com/lammps/lammps/blob/stable/src/update.cpp
+#
+# Restrictions:
+#   This script can not be applied for models which include
+#   charged virtual sites e.g. TIP4P.
+
+
+### Example usage:
+###------------------------------------------------
+# # fix dfield:
+# group         dfield_group    union   all
+# variable      dfield_Dz       equal   0.0
+# variable      dfield_C        equal   332.06371
+# include       /path-to-fix/fix_dfield
+# fix_modify    dfield virial yes
+###------------------------------------------------
+
+
+# Main:
+#------------------------------------------------
+variable    dfield_eps    equal           1/(4*PI*v_dfield_C)                       # permittivity
+compute     dfield_rz     dfield_group    property/atom zu                          # unwrapped coordinates
+variable    dfield_pz     atom            q*c_dfield_rz/vol                         # micro polarization
+compute     dfield_Pz     dfield_group    reduce sum v_dfield_pz                    # macro polarization
+variable    dfield_Ez     equal           v_dfield_Dz-c_dfield_Pz                   # eps0 x electric field
+variable    dfield_Fz     atom            q*v_dfield_Ez/v_dfield_eps                # forces
+variable    dfield_uz     atom            vol*v_dfield_Ez^2/(2*atoms*v_dfield_eps)  # per-atom energy
+fix         dfield        dfield_group    addforce 0 0  v_dfield_Fz energy v_dfield_uz
+#compute     dfield_Uz     dfield_group    reduce sum v_dfield_uz                    # total energy
+variable    dfield_Uz     equal           vol*v_dfield_Ez^2/(2*v_dfield_eps)        # total energy
+#------------------------------------------------
