@@ -1,0 +1,44 @@
+
+units real
+atom_style full
+
+# H: 1
+# O: 2
+
+pair_style  lj/cut/coul/long 10.0
+bond_style  harmonic
+angle_style harmonic
+
+
+read_data initial.data
+
+pair_coeff 2 2  0.1553 3.166
+pair_coeff 1 1  0 0
+pair_coeff 1 2  0 0
+set type 1 charge 0.4238
+set type 2 charge -0.8476
+kspace_style pppm 0.00001
+dielectric  1.0
+bond_coeff  1 0 1.000
+angle_coeff 1 0 109.470
+
+# #---------------------------------------------------------
+# group     dfield_group    union   all
+# variable  dfield_Dz       equal   0.0
+# variable  dfield_C        equal   332.06371
+# include /path-to/in.fix_dfield
+# # fix_modify dfield virial yes
+# #---------------------------------------------------------
+
+timestep 2.0
+# velocity all create 300.0 4928459  dist gaussian mom yes rot yes
+# fix md all npt temp 300 300 $(100*dt) iso 1 1 $(1000*dt)
+fix md all nvt temp 300 300 $(100*dt)
+
+fix hoh all rattle 1e-6 1000 0 b 1 a 1
+
+thermo_style custom step temp press # c_dfield_Pz v_dfield_Ez v_dfield_Uz
+thermo 10
+run 100000
+
+write_data final.data
