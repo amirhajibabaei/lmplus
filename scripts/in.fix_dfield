@@ -49,3 +49,7 @@ fix         dfield        dfield_group    addforce 0 0  v_dfield_Fz energy v_dfi
 #compute     dfield_Uz     dfield_group    reduce sum v_dfield_uz                    # total energy
 variable    dfield_Uz     equal           vol*v_dfield_Ez^2/(2*v_dfield_eps)        # total energy
 #------------------------------------------------
+
+
+# TODO:
+# use compute dipole
