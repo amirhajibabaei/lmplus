@@ -6,7 +6,7 @@
 #   dfield_Dz      variable, electric displacement field (units: charge/distance^2)
 #   dfield_C       variable, units-dependent constant (read from the table below)
 #
-#       units    | dfield_qqr2e
+#       units    | dfield_C
 #       ---------------------
 #       lj       | 1.0
 #       real     | 332.06371
@@ -31,7 +31,7 @@
 # group         dfield_group    union   all
 # variable      dfield_Dz       equal   0.0
 # variable      dfield_C        equal   332.06371
-# include       /path-to-fix/fix_dfield
+# include       /path-to-fix/in.fix_dfield
 # fix_modify    dfield virial yes
 ###------------------------------------------------
 
